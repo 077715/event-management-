@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venue Provider Dashboard - EventHub</title>
+    <meta name="description" content="Venue Provider Dashboard - Manage your venues, bookings, and events on EventHub" />
+    <meta name="keywords" content="venue provider, dashboard, events, bookings, venues, management" />
+    <meta name="author" content="EventHub" />
+    <link rel="icon" type="image/png" href="/icons8-event-50.png" />
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #0dcaf0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            top: 80px;
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            margin: 5px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .main-content {
+            padding: 20px;
+            margin-top: 80px; /* Account for fixed navbar */
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            color: white;
+        }
+
+        .venue-card {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .venue-card .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .booking-request {
+            border-left: 4px solid var(--info-color);
+            background-color: #f8f9fa;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(111, 66, 193, 0.4);
+        }
+
+        .btn-success {
+            border-radius: 8px;
+            padding: 8px 20px;
+        }
+
+        .btn-danger {
+            border-radius: 8px;
+            padding: 8px 20px;
+        }
+
+        .btn-outline-primary {
+            border-radius: 8px;
+            padding: 8px 20px;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .venue-image {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--secondary-color);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg" style="background-color: rgba(151, 89, 213, 0.495); backdrop-filter: blur(70px); border-bottom: 1px solid rgba(97, 63, 163, 0.555);">
+        <div class="container-fluid">
+            <a class="navbar-brand text-black fw-bold" href="#">
+                <img src="/icons8-event-50.png" alt="EventHub Logo" class="me-2" style="height: 32px; width: 32px;">
+                EventHub 
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3 text-black">
+                    Welcome, <strong id="providerName">John Doe</strong>
+                </span>
+                <button class="btn btn-outline-dark btn-sm" onclick="logout()" style="background-color: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px); border-color: rgba(111, 66, 193, 0.5);">
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#dashboard" onclick="showSection('dashboard')">
+                                <i class="bi bi-speedometer2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#my-venues" onclick="showSection('my-venues')">
+                                <i class="bi bi-building"></i>
+                                My Venues
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#add-venue" onclick="showSection('add-venue')">
+                                <i class="bi bi-plus-circle"></i>
+                                Add Venue
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#booking-requests" onclick="showSection('booking-requests')">
+                                <i class="bi bi-calendar-check"></i>
+                                Booking Requests
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="#" onclick="logout()">
+                                <i class="bi bi-box-arrow-right"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 col-lg-10 main-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section">
+                    <h2 class="section-title">
+                        <i class="bi bi-speedometer2 me-2"></i>
+                        Dashboard Overview
+                    </h2>
+
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card stats-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-building fs-1 mb-3"></i>
+                                    <h3 class="card-title" id="totalVenues">5</h3>
+                                    <p class="card-text">Total Venues Added</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card stats-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-calendar-check fs-1 mb-3"></i>
+                                    <h3 class="card-title" id="totalBookings">12</h3>
+                                    <p class="card-text">Total Bookings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card stats-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-currency-dollar fs-1 mb-3"></i>
+                                    <h3 class="card-title" id="totalEarnings">₹45,000</h3>
+                                    <p class="card-text">Total Earnings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card stats-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-star fs-1 mb-3"></i>
+                                    <h3 class="card-title" id="averageRating">4.8</h3>
+                                    <p class="card-text">Average Rating</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bi bi-clock-history me-2"></i>
+                                        Recent Bookings
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Music Concert</strong><br>
+                                                <small class="text-muted">by Rock Band XYZ</small>
+                                            </div>
+                                            <span class="badge bg-success">Confirmed</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Corporate Event</strong><br>
+                                                <small class="text-muted">by Tech Corp</small>
+                                            </div>
+                                            <span class="badge bg-warning">Pending</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Wedding Reception</strong><br>
+                                                <small class="text-muted">by John & Jane</small>
+                                            </div>
+                                            <span class="badge bg-success">Confirmed</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bi bi-graph-up me-2"></i>
+                                        Monthly Performance
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="performanceChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Venues Section -->
+                <div id="my-venues-section" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="bi bi-building me-2"></i>
+                        My Venues
+                    </h2>
+
+                    <div class="row" id="venuesContainer">
+                        <!-- Venue cards will be dynamically generated here -->
+                    </div>
+                </div>
+
+                <!-- Add Venue Section -->
+                <div id="add-venue-section" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Add New Venue
+                    </h2>
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form id="addVenueForm">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="venueName" class="form-label">Venue Name *</label>
+                                                <input type="text" class="form-control" id="venueName" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="capacity" class="form-label">Capacity *</label>
+                                                <input type="number" class="form-control" id="capacity" required>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="pricePerDay" class="form-label">Price per Day (₹) *</label>
+                                                <input type="number" class="form-control" id="pricePerDay" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="location" class="form-label">Location *</label>
+                                                <input type="text" class="form-control" id="location" required>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="description" class="form-label">Description</label>
+                                            <textarea class="form-control" id="description" rows="3"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="amenities" class="form-label">Amenities</label>
+                                            <input type="text" class="form-control" id="amenities" placeholder="e.g., Parking, AC, Sound System">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="venueImage" class="form-label">Venue Image</label>
+                                            <input type="file" class="form-control" id="venueImage" accept="image/*">
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-primary btn-lg">
+                                                <i class="bi bi-plus-circle me-2"></i>
+                                                Add Venue
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Requests Section -->
+                <div id="booking-requests-section" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        Booking Requests
+                    </h2>
+
+                    <div class="row" id="bookingRequestsContainer">
+                        <!-- Booking request cards will be dynamically generated here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, hsl(270, 50%, 20%), hsl(270, 30%, 60%)); color: white;">
+        <div class="container-fluid py-5">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h3 class="fw-bold mb-4">Get in Touch</h3>
+                    <p class="text-white-50 mb-4">
+                        Have questions or suggestions? We'd love to hear from you. 
+                        Send us a message and we'll respond as soon as possible.
+                    </p>
+                    
+                    <form class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="contactName" class="form-label text-white">Your Name</label>
+                            <input type="text" class="form-control" id="contactName" required 
+                                   style="background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="contactEmail" class="form-label text-white">Email Address</label>
+                            <input type="email" class="form-control" id="contactEmail" required
+                                   style="background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="contactMessage" class="form-label text-white">Your Message</label>
+                            <textarea class="form-control" id="contactMessage" rows="4" required
+                                      style="background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="fw-bold fs-4 mb-3">EventHub</div>
+                            <p class="text-white-50 mb-4">
+                                Your premier destination for discovering, hosting, and managing events. 
+                                We connect performers, venues, and audiences to create unforgettable experiences.
+                            </p>
+                            
+                            <div class="mb-3">
+                                <i class="bi bi-envelope me-2 text-primary"></i>
+                                <span class="text-white-50">hello@eventhub.com</span>
+                            </div>
+                            <div class="mb-3">
+                                <i class="bi bi-telephone me-2 text-primary"></i>
+                                <span class="text-white-50">+1 (555) 123-4567</span>
+                            </div>
+                            <div class="mb-3">
+                                <i class="bi bi-geo-alt me-2 text-primary"></i>
+                                <span class="text-white-50">123 Event Street, City, State 12345</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-3">Quick Links</h5>
+                            <div class="row">
+                                <div class="col-6">
+                                    <a href="#" class="d-block text-white-50 text-decoration-none mb-2">Home</a>
+                                    <a href="#" class="d-block text-white-50 text-decoration-none mb-2">Events</a>
+                                    <a href="#" class="d-block text-white-50 text-decoration-none mb-2">About Us</a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="#" class="d-block text-white-50 text-decoration-none mb-2">Contact</a>
+                                    <a href="#" class="d-block text-white-50 text-decoration-none mb-2">Terms of Service</a>
+                                    <a href="#" class="d-block text-white-50 text-decoration-none mb-2">Privacy Policy</a>
+                                </div>
+                            </div>
+                            
+                            <h5 class="fw-bold mb-3 mt-4">Follow Us</h5>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn btn-outline-light btn-sm">
+                                    <i class="bi bi-facebook"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-light btn-sm">
+                                    <i class="bi bi-twitter"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-light btn-sm">
+                                    <i class="bi bi-instagram"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-light btn-sm">
+                                    <i class="bi bi-linkedin"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-white-50 mb-0">© 2024 EventHub. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-white-50 mb-0">Made with ❤️ for the event community</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Sample data
+        let venues = [
+            {
+                id: 1,
+                name: "Grand Ballroom",
+                capacity: 500,
+                pricePerDay: 15000,
+                location: "Mumbai, Maharashtra",
+                status: "Available",
+                description: "Elegant ballroom perfect for weddings and corporate events",
+                amenities: "AC, Sound System, Parking",
+                image: "https://www.conradpune.com/wp-content/uploads/2022/11/1-2.png"
+            },
+            {
+                id: 2,
+                name: "Conference Hall",
+                capacity: 200,
+                pricePerDay: 8000,
+                location: "Delhi, NCR",
+                status: "Not Available",
+                description: "Modern conference hall with state-of-the-art facilities",
+                amenities: "AC, Projector, WiFi, Parking",
+                image: "https://5.imimg.com/data5/SV/DX/GLADMIN-33559172/conference-hall.jpg"
+            },
+            {
+                id: 3,
+                name: "Garden Pavilion",
+                capacity: 300,
+                pricePerDay: 12000,
+                location: "Bangalore, Karnataka",
+                status: "Available",
+                description: "Beautiful outdoor venue surrounded by lush gardens",
+                amenities: "Garden, Parking, Catering",
+                image: "https://i.pinimg.com/474x/5a/cd/d7/5acdd7c4c1593dec81741406a3c03569.jpg"
+            }
+        ];
+
+        let bookingRequests = [
+            {
+                id: 1,
+                performerName: "Rock Band XYZ",
+                eventName: "Music Concert",
+                date: "2024-02-15",
+                venue: "Grand Ballroom",
+                status: "Pending",
+                capacity: 500,
+                price: 15000
+            },
+            {
+                id: 2,
+                performerName: "Tech Corp",
+                eventName: "Corporate Event",
+                date: "2024-02-20",
+                venue: "Conference Hall",
+                status: "Pending",
+                capacity: 200,
+                price: 8000
+            },
+            {
+                id: 3,
+                performerName: "John & Jane",
+                eventName: "Wedding Reception",
+                date: "2024-02-25",
+                venue: "Garden Pavilion",
+                status: "Confirmed",
+                capacity: 300,
+                price: 12000
+            }
+        ];
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in and has venue_provider role
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!user || user.role !== 'venue_provider') {
+                // Redirect to login page
+                window.location.href = '/';
+                return;
+            }
+
+            // Set provider name
+            document.getElementById('providerName').textContent = user.name || 'Venue Provider';
+
+            // Load initial data
+            loadVenues();
+            loadBookingRequests();
+            initializeChart();
+
+            // Setup form submission
+            document.getElementById('addVenueForm').addEventListener('submit', addVenue);
+        });
+
+        // Navigation functions
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('[id$="-section"]').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show selected section
+            document.getElementById(sectionName + '-section').style.display = 'block';
+
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Load venues
+        function loadVenues() {
+            const container = document.getElementById('venuesContainer');
+            container.innerHTML = '';
+
+            if (venues.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="empty-state">
+                                <i class="bi bi-building"></i>
+                                <h4>No Venues Added Yet</h4>
+                                <p>Start by adding your first venue to begin receiving booking requests.</p>
+                                <button class="btn btn-primary" onclick="showSection('add-venue')">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Add Your First Venue
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            venues.forEach(venue => {
+                const venueCard = createVenueCard(venue);
+                container.appendChild(venueCard);
+            });
+
+            // Update total venues count
+            document.getElementById('totalVenues').textContent = venues.length;
+        }
+
+        // Create venue card
+        function createVenueCard(venue) {
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4 mb-4';
+
+            const statusClass = venue.status === 'Available' ? 'bg-success' : 'bg-danger';
+            
+            col.innerHTML = `
+                <div class="card venue-card h-100">
+                    <img src="${venue.image}" class="venue-image" alt="${venue.name}">
+                    <span class="badge ${statusClass} status-badge">${venue.status}</span>
+                    <div class="card-body">
+                        <h5 class="card-title">${venue.name}</h5>
+                        <p class="card-text text-muted">${venue.description}</p>
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <small class="text-muted">Capacity</small><br>
+                                <strong>${venue.capacity}</strong>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Price/Day</small><br>
+                                <strong>₹${venue.pricePerDay.toLocaleString()}</strong>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Location</small><br>
+                                <strong>${venue.location}</strong>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewVenueDetails(${venue.id})">
+                                <i class="bi bi-eye me-1"></i>
+                                View Details
+                            </button>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-outline-primary btn-sm" onclick="editVenue(${venue.id})">
+                                    <i class="bi bi-pencil me-1"></i>
+                                    Edit
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="deleteVenue(${venue.id})">
+                                    <i class="bi bi-trash me-1"></i>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return col;
+        }
+
+        // Load booking requests
+        function loadBookingRequests() {
+            const container = document.getElementById('bookingRequestsContainer');
+            container.innerHTML = '';
+
+            if (bookingRequests.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="empty-state">
+                                <i class="bi bi-calendar-check"></i>
+                                <h4>No Booking Requests</h4>
+                                <p>You haven't received any booking requests yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            bookingRequests.forEach(request => {
+                const requestCard = createBookingRequestCard(request);
+                container.appendChild(requestCard);
+            });
+
+            // Update total bookings count
+            document.getElementById('totalBookings').textContent = bookingRequests.length;
+        }
+
+        // Create booking request card
+        function createBookingRequestCard(request) {
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4 mb-4';
+
+            const statusClass = request.status === 'Confirmed' ? 'bg-success' : 'bg-warning';
+            
+            col.innerHTML = `
+                <div class="card booking-request h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title">${request.eventName}</h5>
+                            <span class="badge ${statusClass}">${request.status}</span>
+                        </div>
+                        <div class="mb-3">
+                            <p class="card-text">
+                                <strong>Performer:</strong> ${request.performerName}<br>
+                                <strong>Venue:</strong> ${request.venue}<br>
+                                <strong>Date:</strong> ${new Date(request.date).toLocaleDateString()}<br>
+                                <strong>Capacity:</strong> ${request.capacity} people<br>
+                                <strong>Price:</strong> ₹${request.price.toLocaleString()}
+                            </p>
+                        </div>
+                        ${request.status === 'Pending' ? `
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success btn-sm" onclick="acceptBooking(${request.id})">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Accept
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="rejectBooking(${request.id})">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Reject
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="alert alert-success mb-0">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Booking Confirmed
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+
+            return col;
+        }
+
+        // Add venue function
+        function addVenue(event) {
+            event.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('venueName').value,
+                capacity: parseInt(document.getElementById('capacity').value),
+                pricePerDay: parseInt(document.getElementById('pricePerDay').value),
+                location: document.getElementById('location').value,
+                description: document.getElementById('description').value,
+                amenities: document.getElementById('amenities').value,
+                status: 'Available'
+            };
+
+            // Add new venue
+            const newVenue = {
+                id: venues.length + 1,
+                ...formData,
+                image: 'https://via.placeholder.com/400x200?text=' + encodeURIComponent(formData.name)
+            };
+
+            venues.push(newVenue);
+            loadVenues();
+
+            // Reset form
+            document.getElementById('addVenueForm').reset();
+
+            // Show success message
+            alert('Venue added successfully!');
+        }
+
+        // Venue management functions
+        function viewVenueDetails(venueId) {
+            const venue = venues.find(v => v.id === venueId);
+            if (venue) {
+                alert(`Venue Details:\n\nName: ${venue.name}\nCapacity: ${venue.capacity}\nPrice: ₹${venue.pricePerDay}\nLocation: ${venue.location}\nStatus: ${venue.status}\nDescription: ${venue.description}\nAmenities: ${venue.amenities}`);
+            }
+        }
+
+        function editVenue(venueId) {
+            const venue = venues.find(v => v.id === venueId);
+            if (venue) {
+                // In a real application, this would open an edit modal
+                alert('Edit functionality would be implemented here');
+            }
+        }
+
+        function deleteVenue(venueId) {
+            if (confirm('Are you sure you want to delete this venue?')) {
+                venues = venues.filter(v => v.id !== venueId);
+                loadVenues();
+                alert('Venue deleted successfully!');
+            }
+        }
+
+        // Booking management functions
+        function acceptBooking(requestId) {
+            const request = bookingRequests.find(r => r.id === requestId);
+            if (request) {
+                request.status = 'Confirmed';
+                loadBookingRequests();
+                alert('Booking request accepted!');
+            }
+        }
+
+        function rejectBooking(requestId) {
+            if (confirm('Are you sure you want to reject this booking request?')) {
+                bookingRequests = bookingRequests.filter(r => r.id !== requestId);
+                loadBookingRequests();
+                alert('Booking request rejected!');
+            }
+        }
+
+        // Initialize chart
+        function initializeChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Bookings',
+                        data: [2, 3, 5, 4, 6, 8],
+                        borderColor: '#6f42c1',
+                        backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

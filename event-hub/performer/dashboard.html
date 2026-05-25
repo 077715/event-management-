@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Performer Dashboard - EventHub</title>
+    <meta name="description" content="Event Performer Dashboard - Manage your performances, bookings, and profile" />
+    <meta name="keywords" content="performer, dashboard, events, bookings, EventHub" />
+    <meta name="author" content="EventHub" />
+    <link rel="icon" type="image/png" href="/icons8-event-50.png" />
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: rgba(111, 66, 193, 0.2);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(111, 66, 193, 0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .navbar-text {
+            font-size: 0.95rem;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            height: calc(100vh - 80px);
+            width: 280px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+            border-right: 1px solid #e9ecef;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar .nav-link {
+            color: #495057;
+            padding: 15px 25px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(111, 66, 193, 0.1);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .sidebar .nav-link.active {
+            background-color: rgba(111, 66, 193, 0.15);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 80px;
+            padding: 30px;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Card Styles */
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px 25px;
+            border: none;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        /* Event Cards */
+        .event-card {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .event-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(111, 66, 193, 0.1);
+        }
+
+        .event-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        /* Form Styles */
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.4);
+        }
+
+        /* Table Styles */
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 15px;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+
+        /* Status Colors */
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-accepted {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(111, 66, 193, 0.05);
+        }
+
+        .file-upload.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(111, 66, 193, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+
+            .navbar-toggler {
+                display: block;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, hsl(270, 50%, 20%), hsl(270, 30%, 60%));
+            color: white;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            padding: 40px 0 20px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(111, 66, 193, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand text-black fw-bold" href="#">
+                <img src="/icons8-event-50.png" alt="EventHub Logo" class="me-2" style="height: 32px; width: 32px;">
+                EventHub - Performer Dashboard
+            </a>
+            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3 text-black">
+                    Welcome, <strong id="performerName">John Performer</strong>
+                </span>
+                <button class="btn btn-outline-dark btn-sm" onclick="logout()" style="background-color: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px); border-color: rgba(111, 66, 193, 0.5);">
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link active" href="#" onclick="showSection('my-events')">
+                <i class="bi bi-calendar-event"></i>
+                My Events
+            </a>
+            <a class="nav-link" href="#" onclick="showSection('add-performance')">
+                <i class="bi bi-plus-circle"></i>
+                Add Performance
+            </a>
+            <a class="nav-link" href="#" onclick="showSection('booking-status')">
+                <i class="bi bi-check-square"></i>
+                Booking Status
+            </a>
+            <a class="nav-link" href="#" onclick="showSection('edit-profile')">
+                <i class="bi bi-person-gear"></i>
+                Edit Profile
+            </a>
+            <a class="nav-link" href="#" onclick="showSection('notifications')">
+                <i class="bi bi-bell"></i>
+                Notifications
+            </a>
+            <hr class="my-3">
+            <a class="nav-link text-danger" href="#" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i>
+                Logout
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- My Events Section -->
+        <div id="my-events" class="content-section">
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalEvents">5</div>
+                        <div class="stat-label">Total Events</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="upcomingEvents">3</div>
+                        <div class="stat-label">Upcoming</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="completedEvents">2</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingBookings">1</div>
+                        <div class="stat-label">Pending Bookings</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-calendar-event me-2"></i>My Events</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="eventsContainer">
+                        <!-- Events will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Performance Section -->
+        <div id="add-performance" class="content-section" style="display: none;">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-plus-circle me-2"></i>Add New Performance</h5>
+                </div>
+                <div class="card-body">
+                    <form id="performanceForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="performanceTitle" class="form-label">Performance Title *</label>
+                                <input type="text" class="form-control" id="performanceTitle" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="performanceCategory" class="form-label">Category *</label>
+                                <select class="form-select" id="performanceCategory" required>
+                                    <option value="">Select Category</option>
+                                    <option value="music">Music</option>
+                                    <option value="dance">Dance</option>
+                                    <option value="comedy">Comedy</option>
+                                    <option value="theater">Theater</option>
+                                    <option value="magic">Magic</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="performanceDescription" class="form-label">Description *</label>
+                            <textarea class="form-control" id="performanceDescription" rows="4" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="performanceDate" class="form-label">Performance Date *</label>
+                                <input type="date" class="form-control" id="performanceDate" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="performanceTime" class="form-label">Start Time *</label>
+                                <input type="time" class="form-control" id="performanceTime" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="performanceDuration" class="form-label">Duration (hours) *</label>
+                                <input type="number" class="form-control" id="performanceDuration" min="0.5" max="8" step="0.5" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="performanceBudget" class="form-label">Budget Range</label>
+                                <select class="form-select" id="performanceBudget">
+                                    <option value="">Select Budget Range</option>
+                                    <option value="0-500">$0 - $500</option>
+                                    <option value="500-1000">$500 - $1,000</option>
+                                    <option value="1000-2500">$1,000 - $2,500</option>
+                                    <option value="2500-5000">$2,500 - $5,000</option>
+                                    <option value="5000+">$5,000+</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="performanceCapacity" class="form-label">Expected Audience Size</label>
+                                <input type="number" class="form-control" id="performanceCapacity" min="1" placeholder="e.g., 100">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Performance Poster/Image</label>
+                            <div class="file-upload" onclick="document.getElementById('performanceImage').click()">
+                                <i class="bi bi-cloud-upload fs-1 text-muted"></i>
+                                <p class="mt-2 mb-0">Click to upload or drag and drop</p>
+                                <small class="text-muted">PNG, JPG, GIF up to 10MB</small>
+                            </div>
+                            <input type="file" id="performanceImage" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Additional Files (Portfolio, Demo, etc.)</label>
+                            <div class="file-upload" onclick="document.getElementById('additionalFiles').click()">
+                                <i class="bi bi-file-earmark-plus fs-1 text-muted"></i>
+                                <p class="mt-2 mb-0">Click to upload additional files</p>
+                                <small class="text-muted">PDF, DOC, MP4, MP3 up to 50MB</small>
+                            </div>
+                            <input type="file" id="additionalFiles" multiple style="display: none;">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle me-2"></i>Create Performance
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Status Section -->
+        <div id="booking-status" class="content-section" style="display: none;">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-check-square me-2"></i>Booking Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Venue</th>
+                                    <th>Event</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingTableBody">
+                                <!-- Booking requests will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Section -->
+        <div id="edit-profile" class="content-section" style="display: none;">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-person-gear me-2"></i>Edit Profile</h5>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm">
+                        <div class="row">
+                            <div class="col-md-4 text-center mb-4">
+                                <div class="mb-3">
+                                    <img src="https://via.placeholder.com/150x150?text=Profile" alt="Profile Picture" class="rounded-circle" id="profilePicture" style="width: 150px; height: 150px; object-fit: cover;">
+                                </div>
+                                <div class="file-upload" onclick="document.getElementById('profileImage').click()" style="padding: 15px;">
+                                    <i class="bi bi-camera me-2"></i>
+                                    Change Photo
+                                </div>
+                                <input type="file" id="profileImage" accept="image/*" style="display: none;">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profileName" class="form-label">Full Name *</label>
+                                        <input type="text" class="form-control" id="profileName" value="John Performer" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profileEmail" class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="profileEmail" value="performer@example.com" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profilePhone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="profilePhone" value="+1 (555) 123-4567">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profileLocation" class="form-label">Location</label>
+                                        <input type="text" class="form-control" id="profileLocation" value="New York, NY">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="profileBio" class="form-label">Bio</label>
+                                    <textarea class="form-control" id="profileBio" rows="4" placeholder="Tell us about yourself and your performances...">Professional performer with 5+ years of experience in music and entertainment. Specializing in acoustic performances and interactive shows.</textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profileWebsite" class="form-label">Website</label>
+                                        <input type="url" class="form-control" id="profileWebsite" placeholder="https://yourwebsite.com">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profileSocial" class="form-label">Social Media</label>
+                                        <input type="text" class="form-control" id="profileSocial" placeholder="@yourusername">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications Section -->
+        <div id="notifications" class="content-section" style="display: none;">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-bell me-2"></i>Notifications</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">New Booking Request</div>
+                                <small class="text-muted">Grand Theater has requested your performance for "Summer Concert" on March 15, 2024</small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">New</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Booking Accepted</div>
+                                <small class="text-muted">Your booking at City Hall has been confirmed for March 10, 2024</small>
+                            </div>
+                            <span class="badge bg-success rounded-pill">Read</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Profile Update Reminder</div>
+                                <small class="text-muted">Consider updating your portfolio with recent performances</small>
+                            </div>
+                            <span class="badge bg-warning rounded-pill">Reminder</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Payment Received</div>
+                                <small class="text-muted">Payment of $1,500 has been processed for your performance at Music Hall</small>
+                            </div>
+                            <span class="badge bg-success rounded-pill">Read</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container-fluid">
+            <div class="footer-content">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h5 class="mb-3">
+                            <img src="/icons8-event-50.png" alt="EventHub Logo" class="me-2" style="height: 24px; width: 24px;">
+                            EventHub
+                        </h5>
+                        <p class="mb-3">Connecting performers with venues to create unforgettable experiences.</p>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="text-white"><i class="bi bi-facebook fs-5"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-twitter fs-5"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-instagram fs-5"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-linkedin fs-5"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h6 class="mb-3">For Performers</h6>
+                        <div class="footer-links">
+                            <div><a href="#">Find Venues</a></div>
+                            <div><a href="#">Create Events</a></div>
+                            <div><a href="#">Manage Bookings</a></div>
+                            <div><a href="#">Pricing</a></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h6 class="mb-3">For Venues</h6>
+                        <div class="footer-links">
+                            <div><a href="#">List Your Venue</a></div>
+                            <div><a href="#">Find Performers</a></div>
+                            <div><a href="#">Manage Events</a></div>
+                            <div><a href="#">Analytics</a></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h6 class="mb-3">Support</h6>
+                        <div class="footer-links">
+                            <div><a href="#">Help Center</a></div>
+                            <div><a href="#">Contact Us</a></div>
+                            <div><a href="#">FAQ</a></div>
+                            <div><a href="#">Community</a></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h6 class="mb-3">Company</h6>
+                        <div class="footer-links">
+                            <div><a href="#">About Us</a></div>
+                            <div><a href="#">Careers</a></div>
+                            <div><a href="#">Press</a></div>
+                            <div><a href="#">Privacy Policy</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0">&copy; 2024 EventHub. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="footer-links">
+                            <a href="#" class="me-3">Terms of Service</a>
+                            <a href="#" class="me-3">Privacy Policy</a>
+                            <a href="#">Cookie Policy</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sample data
+        const sampleEvents = [
+            {
+                id: 1,
+                title: "Summer Music Festival",
+                date: "2024-03-15",
+                venue: "Central Park",
+                status: "Confirmed",
+                image: "https://www.hollywoodreporter.com/wp-content/uploads/2022/03/coachella-music-festival-2019-H-MAIN-022.jpg?w=1080&h=608&crop=1",
+                description: "Acoustic performance featuring original songs and covers"
+            },
+            {
+                id: 2,
+                title: "Jazz Night at Blue Note",
+                date: "2024-03-22",
+                venue: "Blue Note Jazz Club",
+                status: "Pending",
+                image: "https://www.dailynews.com/wp-content/uploads/2025/08/LDN-L-BLUENOTEOPENING-0816-01-1.jpg?w=525",
+                description: "Intimate jazz performance with piano and vocals"
+            },
+            {
+                id: 3,
+                title: "Corporate Event Performance",
+                date: "2024-03-28",
+                venue: "Grand Hotel Ballroom",
+                status: "Confirmed",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLtd-vOoQqEbVYLSEO2pMtMD6ZrQAHJ6fpTQ&s",
+                description: "Background music for corporate networking event"
+            },
+            {
+                id: 4,
+                title: "Wedding Ceremony Music",
+                date: "2024-04-05",
+                venue: "Garden Venue",
+                status: "Confirmed",
+                image: "https://blog.preownedweddingdresses.com/wp-content/uploads/2019/11/wedding-ceremony-music-guide.jpg",
+                description: "Romantic acoustic set for wedding ceremony"
+            },
+            {
+                id: 5,
+                title: "Street Performance",
+                date: "2024-04-12",
+                venue: "Downtown Square",
+                status: "Completed",
+                image: "https://res.cloudinary.com/purnesh/image/upload/w_1080,f_auto/rope02.jpg",
+                description: "Interactive street performance with audience participation"
+            }
+        ];
+
+        const sampleBookings = [
+            {
+                id: 1,
+                venue: "Grand Theater",
+                event: "Summer Concert",
+                date: "2024-03-15",
+                status: "Pending"
+            },
+            {
+                id: 2,
+                venue: "City Hall",
+                event: "Spring Festival",
+                date: "2024-03-10",
+                status: "Accepted"
+            },
+            {
+                id: 3,
+                venue: "Music Hall",
+                event: "Acoustic Night",
+                date: "2024-03-25",
+                status: "Rejected"
+            }
+        ];
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            displayEvents();
+            displayBookings();
+            setupEventListeners();
+        });
+
+        // Load user data from localStorage
+        function loadUserData() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.name) {
+                document.getElementById('performerName').textContent = user.name;
+                document.getElementById('profileName').value = user.name;
+                document.getElementById('profileEmail').value = user.email;
+            }
+        }
+
+        // Display events
+        function displayEvents() {
+            const container = document.getElementById('eventsContainer');
+            container.innerHTML = '';
+
+            sampleEvents.forEach(event => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-lg-4 mb-4';
+
+                const statusClass = event.status === 'Confirmed' ? 'bg-success' : 
+                                  event.status === 'Pending' ? 'bg-warning' : 'bg-secondary';
+
+                col.innerHTML = `
+                    <div class="card event-card h-100">
+                        <div class="position-relative">
+                            <img src="${event.image}" class="event-image" alt="${event.title}">
+                            <span class="badge ${statusClass} status-badge">${event.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">${event.title}</h5>
+                            <p class="card-text text-muted">${event.description}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    ${new Date(event.date).toLocaleDateString()}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    ${event.venue}
+                                </small>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-outline-primary btn-sm me-2" onclick="viewEvent(${event.id})">
+                                    <i class="bi bi-eye me-1"></i>View
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="editEvent(${event.id})">
+                                    <i class="bi bi-pencil me-1"></i>Edit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        // Display bookings
+        function displayBookings() {
+            const tbody = document.getElementById('bookingTableBody');
+            tbody.innerHTML = '';
+
+            sampleBookings.forEach(booking => {
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                let statusText = '';
+                switch(booking.status) {
+                    case 'Pending':
+                        statusClass = 'status-pending';
+                        statusText = 'Pending';
+                        break;
+                    case 'Accepted':
+                        statusClass = 'status-accepted';
+                        statusText = 'Accepted';
+                        break;
+                    case 'Rejected':
+                        statusClass = 'status-rejected';
+                        statusText = 'Rejected';
+                        break;
+                }
+
+                row.innerHTML = `
+                    <td>${booking.venue}</td>
+                    <td>${booking.event}</td>
+                    <td>${new Date(booking.date).toLocaleDateString()}</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>
+                        ${booking.status === 'Pending' ? 
+                            `<button class="btn btn-success btn-sm me-1" onclick="respondToBooking(${booking.id}, 'accept')">
+                                <i class="bi bi-check"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="respondToBooking(${booking.id}, 'reject')">
+                                <i class="bi bi-x"></i>
+                            </button>` :
+                            `<button class="btn btn-outline-primary btn-sm" onclick="viewBookingDetails(${booking.id})">
+                                <i class="bi bi-eye"></i> View
+                            </button>`
+                        }
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Show section
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).style.display = 'block';
+
+            // Update active nav link
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Add fade-in animation
+            document.getElementById(sectionId).classList.add('fade-in');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Performance form
+            document.getElementById('performanceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handlePerformanceSubmit();
+            });
+
+            // Profile form
+            document.getElementById('profileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleProfileSubmit();
+            });
+
+            // File upload handlers
+            document.getElementById('performanceImage').addEventListener('change', handleFileUpload);
+            document.getElementById('additionalFiles').addEventListener('change', handleFileUpload);
+            document.getElementById('profileImage').addEventListener('change', handleProfileImageUpload);
+        }
+
+        // Handle performance form submission
+        function handlePerformanceSubmit() {
+            const formData = {
+                title: document.getElementById('performanceTitle').value,
+                category: document.getElementById('performanceCategory').value,
+                description: document.getElementById('performanceDescription').value,
+                date: document.getElementById('performanceDate').value,
+                time: document.getElementById('performanceTime').value,
+                duration: document.getElementById('performanceDuration').value,
+                budget: document.getElementById('performanceBudget').value,
+                capacity: document.getElementById('performanceCapacity').value
+            };
+
+            // Simulate API call
+            setTimeout(() => {
+                alert('Performance created successfully!');
+                document.getElementById('performanceForm').reset();
+                showSection('my-events');
+                // Refresh events display
+                displayEvents();
+            }, 1000);
+        }
+
+        // Handle profile form submission
+        function handleProfileSubmit() {
+            const formData = {
+                name: document.getElementById('profileName').value,
+                email: document.getElementById('profileEmail').value,
+                phone: document.getElementById('profilePhone').value,
+                location: document.getElementById('profileLocation').value,
+                bio: document.getElementById('profileBio').value,
+                website: document.getElementById('profileWebsite').value,
+                social: document.getElementById('profileSocial').value
+            };
+
+            // Update user data in localStorage
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            user.name = formData.name;
+            user.email = formData.email;
+            localStorage.setItem('user', JSON.stringify(user));
+
+            // Update navbar
+            document.getElementById('performerName').textContent = formData.name;
+
+            // Simulate API call
+            setTimeout(() => {
+                alert('Profile updated successfully!');
+            }, 1000);
+        }
+
+        // Handle file upload
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const uploadArea = event.target.previousElementSibling;
+                uploadArea.innerHTML = `
+                    <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                    <p class="mt-2 mb-0 text-success">File uploaded: ${file.name}</p>
+                    <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                `;
+            }
+        }
+
+        // Handle profile image upload
+        function handleProfileImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePicture').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Event actions
+        function viewEvent(eventId) {
+            const event = sampleEvents.find(e => e.id === eventId);
+            alert(`Viewing event: ${event.title}\nDate: ${event.date}\nVenue: ${event.venue}\nStatus: ${event.status}`);
+        }
+
+        function editEvent(eventId) {
+            const event = sampleEvents.find(e => e.id === eventId);
+            alert(`Editing event: ${event.title}`);
+        }
+
+        // Booking actions
+        function respondToBooking(bookingId, action) {
+            const booking = sampleBookings.find(b => b.id === bookingId);
+            if (action === 'accept') {
+                booking.status = 'Accepted';
+                alert(`Booking accepted for ${booking.event} at ${booking.venue}`);
+            } else {
+                booking.status = 'Rejected';
+                alert(`Booking rejected for ${booking.event} at ${booking.venue}`);
+            }
+            displayBookings();
+        }
+
+        function viewBookingDetails(bookingId) {
+            const booking = sampleBookings.find(b => b.id === bookingId);
+            alert(`Booking Details:\nVenue: ${booking.venue}\nEvent: ${booking.event}\nDate: ${booking.date}\nStatus: ${booking.status}`);
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.navbar-toggler');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggleBtn.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

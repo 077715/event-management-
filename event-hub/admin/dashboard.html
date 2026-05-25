@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - EventHub</title>
+    <meta name="description" content="Admin Dashboard - EventHub Administration Panel" />
+    <meta name="keywords" content="admin, dashboard, EventHub, administration" />
+    <meta name="author" content="EventHub" />
+    <link rel="icon" type="image/png" href="/icons8-event-50.png" />
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: rgba(111, 66, 193, 0.2);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(111, 66, 193, 0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .navbar-text {
+            font-size: 0.95rem;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            height: calc(100vh - 80px);
+            width: 280px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+            border-right: 1px solid #e9ecef;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar .nav-link {
+            color: #495057;
+            padding: 15px 25px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(111, 66, 193, 0.1);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .sidebar .nav-link.active {
+            background-color: rgba(111, 66, 193, 0.15);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 80px;
+            padding: 30px;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Card Styles */
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px 25px;
+            border: none;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(111, 66, 193, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Table Styles */
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 15px;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+
+        /* Status Colors */
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-suspended {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+
+            .navbar-toggler {
+                display: block;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, hsl(270, 50%, 20%), hsl(270, 30%, 60%));
+            color: white;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            padding: 40px 0 20px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1050;
+        }
+    </style>
+</head>
+<body>
+    <!-- Security Check -->
+    <script>
+        // Check if admin is logged in
+        if (localStorage.getItem('isAdmin') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand text-black fw-bold" href="#">
+                <img src="/icons8-event-50.png" alt="EventHub Logo" class="me-2" style="height: 32px; width: 32px;">
+                EventHub - Admin Dashboard
+            </a>
+            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3 text-black">
+                    Welcome, <strong>Administrator</strong>
+                </span>
+                <button class="btn btn-outline-dark btn-sm" onclick="adminLogout()" style="background-color: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px); border-color: rgba(111, 66, 193, 0.5);">
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link active" href="#" onclick="showSection('dashboard-overview')">
+                <i class="bi bi-speedometer2"></i>
+                Dashboard Overview
+            </a>
+            <a class="nav-link" href="#" onclick="showSection('manage-events')">
+                <i class="bi bi-calendar-event"></i>
+                Manage Events
+            </a>
+            <a class="nav-link" href="#" onclick="showSection('manage-venues')">
+                <i class="bi bi-building"></i>
+                Manage Venues
+            </a>
+            <a class="nav-link" href="#" onclick="showSection('manage-users')">
+                <i class="bi bi-people"></i>
+                Manage Users
+            </a>
+            <a class="nav-link" href="#" onclick="showSection('reports-analytics')">
+                <i class="bi bi-graph-up"></i>
+                Reports / Analytics
+            </a>
+            <hr class="my-3">
+            <a class="nav-link text-danger" href="#" onclick="adminLogout()">
+                <i class="bi bi-box-arrow-right"></i>
+                Logout
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Overview Section -->
+        <div id="dashboard-overview" class="content-section">
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUsers">1,247</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalVenues">89</div>
+                        <div class="stat-label">Total Venues</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalEvents">156</div>
+                        <div class="stat-label">Total Events</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingRequests">23</div>
+                        <div class="stat-label">Pending Requests</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card dashboard-card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-clock-history me-2"></i>Recent Activity</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">New Event Request</div>
+                                        <small class="text-muted">Summer Music Festival by John Performer</small>
+                                    </div>
+                                    <small class="text-muted">2 min ago</small>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">Venue Approved</div>
+                                        <small class="text-muted">Grand Theater by Sarah Provider</small>
+                                    </div>
+                                    <small class="text-muted">15 min ago</small>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">User Registration</div>
+                                        <small class="text-muted">New attendee: mike@example.com</small>
+                                    </div>
+                                    <small class="text-muted">1 hour ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card dashboard-card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-exclamation-triangle me-2"></i>Pending Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">5 Event Requests</div>
+                                        <small class="text-muted">Awaiting approval</small>
+                                    </div>
+                                    <span class="badge bg-warning rounded-pill">5</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">3 Venue Applications</div>
+                                        <small class="text-muted">Need review</small>
+                                    </div>
+                                    <span class="badge bg-warning rounded-pill">3</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">2 User Reports</div>
+                                        <small class="text-muted">Require attention</small>
+                                    </div>
+                                    <span class="badge bg-danger rounded-pill">2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Events Section -->
+        <div id="manage-events" class="content-section" style="display: none;">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-calendar-event me-2"></i>Manage Events</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Event Name</th>
+                                    <th>Performer</th>
+                                    <th>Date</th>
+                                    <th>Venue</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventsTableBody">
+                                <!-- Events will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Venues Section -->
+        <div id="manage-venues" class="content-section" style="display: none;">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-building me-2"></i>Manage Venues</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Venue Name</th>
+                                    <th>Location</th>
+                                    <th>Provider</th>
+                                    <th>Capacity</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="venuesTableBody">
+                                <!-- Venues will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Users Section -->
+        <div id="manage-users" class="content-section" style="display: none;">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="bi bi-people me-2"></i>Manage Users</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Join Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Users will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports / Analytics Section -->
+        <div id="reports-analytics" class="content-section" style="display: none;">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card dashboard-card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-graph-up me-2"></i>Event Registrations Over Time</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="registrationsChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card dashboard-card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-pie-chart me-2"></i>Most Booked Venues</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="venuesChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="card dashboard-card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-currency-dollar me-2"></i>Revenue Trends</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="revenueChart" width="400" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container">
+        <div id="actionToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong class="me-auto">Action Completed</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Action completed successfully!
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container-fluid">
+            <div class="footer-content">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h5 class="mb-3">
+                            <img src="/icons8-event-50.png" alt="EventHub Logo" class="me-2" style="height: 24px; width: 24px;">
+                            EventHub
+                        </h5>
+                        <p class="mb-3">Administration panel for managing the EventHub platform.</p>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="text-white"><i class="bi bi-facebook fs-5"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-twitter fs-5"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-instagram fs-5"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-linkedin fs-5"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h6 class="mb-3">Management</h6>
+                        <div class="footer-links">
+                            <div><a href="#">Events</a></div>
+                            <div><a href="#">Venues</a></div>
+                            <div><a href="#">Users</a></div>
+                            <div><a href="#">Reports</a></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h6 class="mb-3">System</h6>
+                        <div class="footer-links">
+                            <div><a href="#">Settings</a></div>
+                            <div><a href="#">Logs</a></div>
+                            <div><a href="#">Backup</a></div>
+                            <div><a href="#">Security</a></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h6 class="mb-3">Support</h6>
+                        <div class="footer-links">
+                            <div><a href="#">Help Center</a></div>
+                            <div><a href="#">Contact</a></div>
+                            <div><a href="#">Documentation</a></div>
+                            <div><a href="#">Updates</a></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h6 class="mb-3">Admin</h6>
+                        <div class="footer-links">
+                            <div><a href="#">Profile</a></div>
+                            <div><a href="#">Settings</a></div>
+                            <div><a href="#">Logout</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0">&copy; 2024 EventHub Admin Panel. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="footer-links">
+                            <a href="#" class="me-3">Privacy Policy</a>
+                            <a href="#" class="me-3">Terms of Service</a>
+                            <a href="#">Security</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sample data
+        const sampleEvents = [
+            {
+                id: 1,
+                name: "Summer Music Festival",
+                performer: "John Performer",
+                date: "2024-03-15",
+                venue: "Central Park",
+                status: "Pending"
+            },
+            {
+                id: 2,
+                name: "Jazz Night",
+                performer: "Sarah Musician",
+                date: "2024-03-22",
+                venue: "Blue Note Club",
+                status: "Approved"
+            },
+            {
+                id: 3,
+                name: "Comedy Show",
+                performer: "Mike Comedian",
+                date: "2024-03-28",
+                venue: "Laugh Factory",
+                status: "Pending"
+            },
+            {
+                id: 4,
+                name: "Dance Performance",
+                performer: "Lisa Dancer",
+                date: "2024-04-05",
+                venue: "Dance Studio",
+                status: "Approved"
+            },
+            {
+                id: 5,
+                name: "Magic Show",
+                performer: "David Magician",
+                date: "2024-04-12",
+                venue: "Magic Theater",
+                status: "Rejected"
+            }
+        ];
+
+        const sampleVenues = [
+            {
+                id: 1,
+                name: "Grand Theater",
+                location: "New York, NY",
+                provider: "Sarah Provider",
+                capacity: 500,
+                status: "Pending"
+            },
+            {
+                id: 2,
+                name: "Music Hall",
+                location: "Los Angeles, CA",
+                provider: "John Provider",
+                capacity: 300,
+                status: "Approved"
+            },
+            {
+                id: 3,
+                name: "Garden Venue",
+                location: "Chicago, IL",
+                provider: "Emily Provider",
+                capacity: 200,
+                status: "Pending"
+            },
+            {
+                id: 4,
+                name: "Convention Center",
+                location: "Miami, FL",
+                provider: "Robert Provider",
+                capacity: 1000,
+                status: "Approved"
+            },
+            {
+                id: 5,
+                name: "Intimate Club",
+                location: "Seattle, WA",
+                provider: "Anna Provider",
+                capacity: 100,
+                status: "Rejected"
+            }
+        ];
+
+        const sampleUsers = [
+            {
+                id: 1,
+                name: "John Performer",
+                email: "john@example.com",
+                role: "Event Performer",
+                joinDate: "2024-01-15",
+                status: "Active"
+            },
+            {
+                id: 2,
+                name: "Sarah Provider",
+                email: "sarah@example.com",
+                role: "Venue Provider",
+                joinDate: "2024-01-20",
+                status: "Active"
+            },
+            {
+                id: 3,
+                name: "Mike Attendee",
+                email: "mike@example.com",
+                role: "Attendee",
+                joinDate: "2024-02-01",
+                status: "Active"
+            },
+            {
+                id: 4,
+                name: "Lisa Dancer",
+                email: "lisa@example.com",
+                role: "Event Performer",
+                joinDate: "2024-02-10",
+                status: "Suspended"
+            },
+            {
+                id: 5,
+                name: "David Magician",
+                email: "david@example.com",
+                role: "Event Performer",
+                joinDate: "2024-02-15",
+                status: "Active"
+            }
+        ];
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            displayEvents();
+            displayVenues();
+            displayUsers();
+            initializeCharts();
+        });
+
+        // Display events
+        function displayEvents() {
+            const tbody = document.getElementById('eventsTableBody');
+            tbody.innerHTML = '';
+
+            sampleEvents.forEach(event => {
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                let statusText = '';
+                switch(event.status) {
+                    case 'Pending':
+                        statusClass = 'status-pending';
+                        statusText = 'Pending';
+                        break;
+                    case 'Approved':
+                        statusClass = 'status-approved';
+                        statusText = 'Approved';
+                        break;
+                    case 'Rejected':
+                        statusClass = 'status-rejected';
+                        statusText = 'Rejected';
+                        break;
+                }
+
+                row.innerHTML = `
+                    <td>${event.name}</td>
+                    <td>${event.performer}</td>
+                    <td>${new Date(event.date).toLocaleDateString()}</td>
+                    <td>${event.venue}</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>
+                        ${event.status === 'Pending' ? 
+                            `<button class="btn btn-success btn-sm me-1" onclick="approveEvent(${event.id})">
+                                <i class="bi bi-check"></i> Approve
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="rejectEvent(${event.id})">
+                                <i class="bi bi-x"></i> Reject
+                            </button>` :
+                            `<button class="btn btn-outline-primary btn-sm" onclick="viewEventDetails(${event.id})">
+                                <i class="bi bi-eye"></i> View
+                            </button>`
+                        }
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Display venues
+        function displayVenues() {
+            const tbody = document.getElementById('venuesTableBody');
+            tbody.innerHTML = '';
+
+            sampleVenues.forEach(venue => {
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                let statusText = '';
+                switch(venue.status) {
+                    case 'Pending':
+                        statusClass = 'status-pending';
+                        statusText = 'Pending';
+                        break;
+                    case 'Approved':
+                        statusClass = 'status-approved';
+                        statusText = 'Approved';
+                        break;
+                    case 'Rejected':
+                        statusClass = 'status-rejected';
+                        statusText = 'Rejected';
+                        break;
+                }
+
+                row.innerHTML = `
+                    <td>${venue.name}</td>
+                    <td>${venue.location}</td>
+                    <td>${venue.provider}</td>
+                    <td>${venue.capacity}</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>
+                        ${venue.status === 'Pending' ? 
+                            `<button class="btn btn-success btn-sm me-1" onclick="approveVenue(${venue.id})">
+                                <i class="bi bi-check"></i> Approve
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="rejectVenue(${venue.id})">
+                                <i class="bi bi-x"></i> Reject
+                            </button>` :
+                            `<button class="btn btn-outline-primary btn-sm" onclick="viewVenueDetails(${venue.id})">
+                                <i class="bi bi-eye"></i> View
+                            </button>`
+                        }
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Display users
+        function displayUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            sampleUsers.forEach(user => {
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                let statusText = '';
+                switch(user.status) {
+                    case 'Active':
+                        statusClass = 'status-active';
+                        statusText = 'Active';
+                        break;
+                    case 'Suspended':
+                        statusClass = 'status-suspended';
+                        statusText = 'Suspended';
+                        break;
+                }
+
+                row.innerHTML = `
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.role}</td>
+                    <td>${new Date(user.joinDate).toLocaleDateString()}</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>
+                        ${user.status === 'Active' ? 
+                            `<button class="btn btn-warning btn-sm me-1" onclick="suspendUser(${user.id})">
+                                <i class="bi bi-pause"></i> Suspend
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="removeUser(${user.id})">
+                                <i class="bi bi-trash"></i> Remove
+                            </button>` :
+                            `<button class="btn btn-success btn-sm me-1" onclick="activateUser(${user.id})">
+                                <i class="bi bi-play"></i> Activate
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="removeUser(${user.id})">
+                                <i class="bi bi-trash"></i> Remove
+                            </button>`
+                        }
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            // Event Registrations Chart
+            const registrationsCtx = document.getElementById('registrationsChart').getContext('2d');
+            new Chart(registrationsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Event Registrations',
+                        data: [65, 59, 80, 81, 56, 55],
+                        borderColor: '#6f42c1',
+                        backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Most Booked Venues Chart
+            const venuesCtx = document.getElementById('venuesChart').getContext('2d');
+            new Chart(venuesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Grand Theater', 'Music Hall', 'Garden Venue', 'Convention Center', 'Others'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: [
+                            '#6f42c1',
+                            '#8e44ad',
+                            '#9b59b6',
+                            '#a569bd',
+                            '#bb8fce'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Revenue Trends Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: [12000, 19000, 30000, 50000, 20000, 30000],
+                        backgroundColor: 'rgba(111, 66, 193, 0.8)',
+                        borderColor: '#6f42c1',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Show section
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).style.display = 'block';
+
+            // Update active nav link
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Add fade-in animation
+            document.getElementById(sectionId).classList.add('fade-in');
+        }
+
+        // Event actions
+        function approveEvent(eventId) {
+            const event = sampleEvents.find(e => e.id === eventId);
+            event.status = 'Approved';
+            displayEvents();
+            showToast('Event approved successfully!', 'success');
+        }
+
+        function rejectEvent(eventId) {
+            const event = sampleEvents.find(e => e.id === eventId);
+            event.status = 'Rejected';
+            displayEvents();
+            showToast('Event rejected successfully!', 'danger');
+        }
+
+        function viewEventDetails(eventId) {
+            const event = sampleEvents.find(e => e.id === eventId);
+            alert(`Event Details:\nName: ${event.name}\nPerformer: ${event.performer}\nDate: ${event.date}\nVenue: ${event.venue}\nStatus: ${event.status}`);
+        }
+
+        // Venue actions
+        function approveVenue(venueId) {
+            const venue = sampleVenues.find(v => v.id === venueId);
+            venue.status = 'Approved';
+            displayVenues();
+            showToast('Venue approved successfully!', 'success');
+        }
+
+        function rejectVenue(venueId) {
+            const venue = sampleVenues.find(v => v.id === venueId);
+            venue.status = 'Rejected';
+            displayVenues();
+            showToast('Venue rejected successfully!', 'danger');
+        }
+
+        function viewVenueDetails(venueId) {
+            const venue = sampleVenues.find(v => v.id === venueId);
+            alert(`Venue Details:\nName: ${venue.name}\nLocation: ${venue.location}\nProvider: ${venue.provider}\nCapacity: ${venue.capacity}\nStatus: ${venue.status}`);
+        }
+
+        // User actions
+        function suspendUser(userId) {
+            const user = sampleUsers.find(u => u.id === userId);
+            user.status = 'Suspended';
+            displayUsers();
+            showToast('User suspended successfully!', 'warning');
+        }
+
+        function activateUser(userId) {
+            const user = sampleUsers.find(u => u.id === userId);
+            user.status = 'Active';
+            displayUsers();
+            showToast('User activated successfully!', 'success');
+        }
+
+        function removeUser(userId) {
+            if (confirm('Are you sure you want to remove this user?')) {
+                const userIndex = sampleUsers.findIndex(u => u.id === userId);
+                sampleUsers.splice(userIndex, 1);
+                displayUsers();
+                showToast('User removed successfully!', 'danger');
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type) {
+            const toast = document.getElementById('actionToast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastHeader = toast.querySelector('.toast-header');
+            
+            toastMessage.textContent = message;
+            
+            // Update icon based on type
+            const icon = toastHeader.querySelector('i');
+            icon.className = `bi ${type === 'success' ? 'bi-check-circle-fill text-success' : 
+                              type === 'danger' ? 'bi-x-circle-fill text-danger' : 
+                              'bi-exclamation-triangle-fill text-warning'} me-2`;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // Admin logout
+        function adminLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('isAdmin');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.navbar-toggler');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggleBtn.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

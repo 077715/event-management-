@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - EventHub</title>
+    <meta name="description" content="Admin Login - EventHub Administration Panel" />
+    <meta name="keywords" content="admin, login, EventHub, administration" />
+    <meta name="author" content="EventHub" />
+    <link rel="icon" type="image/png" href="/icons8-event-50.png" />
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --secondary-color: #6c757d;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .login-body {
+            padding: 30px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #8e44ad);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.4);
+        }
+
+        .admin-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .admin-info h6 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .admin-info small {
+            color: var(--secondary-color);
+        }
+
+        .demo-credentials {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .demo-credentials h6 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .demo-credentials small {
+            color: #424242;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <img src="/icons8-event-50.png" alt="EventHub Logo" class="mb-3" style="height: 64px; width: 64px;">
+            <h3 class="mb-0">EventHub</h3>
+            <p class="mb-0 opacity-75">Admin Panel</p>
+        </div>
+        
+        <div class="login-body">
+            <div class="admin-info">
+                <h6><i class="bi bi-shield-check me-2"></i>Administrator Access</h6>
+                <small>Access the EventHub administration panel</small>
+            </div>
+
+            <!-- Alert for invalid credentials -->
+            <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Invalid credentials. Please try again.
+            </div>
+
+            <form id="adminLoginForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-person"></i>
+                        </span>
+                        <input type="text" class="form-control" id="username" placeholder="Enter username" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                            <i class="bi bi-eye" id="passwordToggle"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Login
+                    </button>
+                </div>
+
+                <div class="text-center">
+                    <small class="text-muted">
+                        <a href="/" class="text-decoration-none">← Back to EventHub</a>
+                    </small>
+                </div>
+            </form>
+
+            <div class="demo-credentials">
+                <h6><i class="bi bi-lightbulb me-2"></i>Demo Credentials</h6>
+                <small>
+                    <strong>Username:</strong> admin<br>
+                    <strong>Password:</strong> admin123
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordToggle.className = 'bi bi-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                passwordToggle.className = 'bi bi-eye';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Check credentials
+            if (username === 'admin' && password === 'admin123') {
+                // Store admin status in localStorage
+                localStorage.setItem('isAdmin', 'true');
+                
+                // Show loading state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Logging in...';
+                submitBtn.disabled = true;
+                
+                // Simulate API delay and redirect
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            } else {
+                // Show error alert
+                const errorAlert = document.getElementById('errorAlert');
+                errorAlert.classList.remove('d-none');
+                
+                // Hide alert after 5 seconds
+                setTimeout(() => {
+                    errorAlert.classList.add('d-none');
+                }, 5000);
+                
+                // Clear form
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            }
+        });
+
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('isAdmin') === 'true') {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Event Portal Design System - Gradient Theme */
+
+@layer base {
+  :root {
+    /* Base Background */
+    --background: 220 26% 98%;
+    --foreground: 221 39% 11%;
+
+    /* Card System */
+    --card: 220 20% 97%;
+    --card-foreground: 221 39% 11%;
+
+    /* Popover */
+    --popover: 220 20% 97%;
+    --popover-foreground: 221 39% 11%;
+
+    /* Primary - Purple Theme */
+    --primary: 271 76% 53%;
+    --primary-foreground: 210 40% 98%;
+    
+    /* Secondary - Dark Blue */
+    --secondary: 221 83% 53%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Muted */
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Accent - Violet */
+    --accent: 264 83% 57%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Borders & Inputs */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 271 76% 53%;
+
+    /* Custom Event Portal Colors */
+    --purple: 271 76% 53%;
+    --dark-blue: 221 83% 53%;
+    --neon-blue: 189 94% 43%;
+    --violet: 264 83% 57%;
+    --gradient-black: 220 26% 8%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--purple)), hsl(var(--dark-blue)));
+    --gradient-dark: linear-gradient(135deg, hsl(270, 50%, 20%), hsl(270, 30%, 60%));
+    --gradient-overlay: linear-gradient(135deg, hsl(var(--purple) / 0.8), hsl(var(--dark-blue) / 0.9));
+    --gradient-glass: linear-gradient(135deg, hsl(var(--purple) / 0.1), hsl(var(--dark-blue) / 0.1));
+
+    /* Glass Effect */
+    --glass-bg: hsl(var(--background) / 0.8);
+    --glass-border: hsl(var(--border) / 0.2);
+
+    /* Shadows */
+    --shadow-glass: 0 8px 32px hsl(var(--purple) / 0.15);
+    --shadow-card: 0 4px 16px hsl(var(--dark-blue) / 0.1);
+    --shadow-hero: 0 20px 60px hsl(var(--gradient-black) / 0.3);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark Base */
+    --background: 220 26% 8%;
+    --foreground: 210 40% 98%;
+
+    /* Dark Cards */
+    --card: 220 26% 12%;
+    --card-foreground: 210 40% 98%;
+
+    /* Dark Popover */
+    --popover: 220 26% 12%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Dark Primary - Keep Purple */
+    --primary: 271 76% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    /* Dark Secondary */
+    --secondary: 221 83% 45%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Dark Muted */
+    --muted: 220 26% 15%;
+    --muted-foreground: 215 20% 70%;
+
+    /* Dark Accent - Violet */
+    --accent: 264 83% 57%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Dark Destructive */
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Dark Borders */
+    --border: 220 26% 18%;
+    --input: 220 26% 18%;
+    --ring: 271 76% 53%;
+
+    /* Dark Glass Effect */
+    --glass-bg: hsl(var(--background) / 0.7);
+    --glass-border: hsl(var(--border) / 0.3);
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom Utilities */
+@layer utilities {
+  /* Glass Effect */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Gradient Backgrounds */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-dark {
+    background: var(--gradient-dark);
+  }
+
+  .gradient-overlay {
+    background: var(--gradient-overlay);
+  }
+
+  .gradient-glass {
+    background: var(--gradient-glass);
+  }
+
+  /* Shadow Effects */
+  .shadow-glass {
+    box-shadow: var(--shadow-glass);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-hero {
+    box-shadow: var(--shadow-hero);
+  }
+
+  /* Smooth Transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* Hover Effects */
+  .hover-scale {
+    @apply transition-smooth hover:scale-105;
+  }
+
+  .hover-glow {
+    @apply transition-smooth hover:shadow-glass;
+  }
+}
